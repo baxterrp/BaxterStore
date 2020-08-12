@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaxterStore.Data", "BaxterStore.Data\BaxterStore.Data.csproj", "{62DCDEBF-F841-40B0-9AFF-FD0C4E77BC0B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BaxterStore.Data", "BaxterStore.Data\BaxterStore.Data.csproj", "{62DCDEBF-F841-40B0-9AFF-FD0C4E77BC0B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaxterStore.Service", "BaxterStore.Service\BaxterStore.Service.csproj", "{807E8EA0-76EE-4C4F-BADE-A1330F15B461}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaxterStore.Api", "BaxterStore.Api\BaxterStore.Api.csproj", "{31BEDB34-CF3D-48C5-98BF-AB905751B488}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{62DCDEBF-F841-40B0-9AFF-FD0C4E77BC0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62DCDEBF-F841-40B0-9AFF-FD0C4E77BC0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62DCDEBF-F841-40B0-9AFF-FD0C4E77BC0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{807E8EA0-76EE-4C4F-BADE-A1330F15B461}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{807E8EA0-76EE-4C4F-BADE-A1330F15B461}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{807E8EA0-76EE-4C4F-BADE-A1330F15B461}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{807E8EA0-76EE-4C4F-BADE-A1330F15B461}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31BEDB34-CF3D-48C5-98BF-AB905751B488}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31BEDB34-CF3D-48C5-98BF-AB905751B488}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31BEDB34-CF3D-48C5-98BF-AB905751B488}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31BEDB34-CF3D-48C5-98BF-AB905751B488}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
