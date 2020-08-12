@@ -18,8 +18,8 @@ namespace BaxterStore.Data.Implementation
 
         protected CrudRepository(DatabaseConfiguration databaseConfiguration, TableConfiguration tableConfiguration)
         {
-            _databaseConfiguration = databaseConfiguration;
-            _tableConfiguration = tableConfiguration;
+            _databaseConfiguration = databaseConfiguration ?? throw new ArgumentNullException(nameof(databaseConfiguration));
+            _tableConfiguration = tableConfiguration ?? throw new ArgumentNullException(nameof(tableConfiguration));
         }
 
         public async Task<TDataEntity> Add(TDataEntity dataEntity)
