@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaxterStore.Data", "BaxterStore.Data\BaxterStore.Data.csproj", "{62DCDEBF-F841-40B0-9AFF-FD0C4E77BC0B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{62DCDEBF-F841-40B0-9AFF-FD0C4E77BC0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62DCDEBF-F841-40B0-9AFF-FD0C4E77BC0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62DCDEBF-F841-40B0-9AFF-FD0C4E77BC0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62DCDEBF-F841-40B0-9AFF-FD0C4E77BC0B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {492528D8-F5D4-4BA5-81CC-D564B502F425}
+	EndGlobalSection
+EndGlobal
