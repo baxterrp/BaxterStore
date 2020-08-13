@@ -1,11 +1,13 @@
 using BaxterStore.Data.Exceptions;
 using BaxterStore.Data.Implementation.Users;
 using BaxterStore.Data.Interfaces;
+using BaxterStore.Data.Migrations;
 using BaxterStore.Data.POCOs;
 using BaxterStore.Data.POCOs.Users;
 using BaxterStore.Service.Implementation.Users;
 using BaxterStore.Service.Interfaces;
 using BaxterStore.Service.POCOs;
+using FluentMigrator.Runner;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -37,11 +39,16 @@ namespace BaxterStore.Api
             Configuration.GetSection("TableConfiguration:Users").Bind(userTableConfiguration);
             services.AddSingleton<ICrudRepository<UserDataEntity>, UserRepository>(sp => new UserRepository(databaseConfiguration, userTableConfiguration));
 
+            services.AddFluentMigratorCore()
+                .ConfigureRunner(runner => runner.AddSqlServer()
+                    .WithGlobalConnectionString(databaseConfiguration.ConnectionString)
+                    .ScanIn(typeof(Version1).Assembly).For.Migrations());
+
             services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IMigrationRunner runner)
         {
             if (env.IsDevelopment())
             {
@@ -60,6 +67,8 @@ namespace BaxterStore.Api
             {
                 endpoints.MapControllers();
             });
+
+            runner.MigrateUp();
         }
     }
 }
