@@ -1,4 +1,5 @@
-﻿using BaxterStore.Service.Interfaces;
+﻿using BaxterStore.Api.Contracts;
+using BaxterStore.Service.Interfaces;
 using BaxterStore.Service.POCOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,19 @@ namespace BaxterStore.Api.Controllers
         public UserController(IUserService userService)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+        }
+
+        [HttpPost("/users/login")]
+        public async Task<IActionResult> Login([FromBody]LoginContract loginContract)
+        {
+            try
+            {
+                return Ok(await _userService.Login(loginContract.Email, loginContract.Password));
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         [HttpPost("/users")]
