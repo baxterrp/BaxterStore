@@ -42,7 +42,7 @@ namespace BaxterStore.Data.Implementation
         public bool TryGetValue(string entityId, out TDataEntity dataEntity)
         {
             _logger.LogTrace("Looking up cached data entity with key {id}", entityId);
-            if(_memoryCache.TryGetValue(entityId, out TDataEntity cachedDataEntity) && cachedDataEntity != null)
+            if(_memoryCache.TryGetValue(entityId, out TDataEntity cachedDataEntity))
             {
                 _logger.LogTrace("Found cached data entity with key {id}", entityId);
                 dataEntity = cachedDataEntity;
@@ -52,6 +52,20 @@ namespace BaxterStore.Data.Implementation
             _logger.LogTrace("No cached data entity found with key {id}", entityId);
             dataEntity = null;
             return false;
+        }
+
+        public void UpdateExisting(TDataEntity dataEntity)
+        {
+            _logger.LogTrace("Looking up cached data entity with key {id}", dataEntity.Id);
+            if(_memoryCache.TryGetValue(dataEntity.Id, out TDataEntity cachedDataEntity))
+            {
+                _memoryCache.Remove(cachedDataEntity.Id);
+                _memoryCache.Set(dataEntity.Id, dataEntity);
+
+                return;
+            }
+
+            _logger.LogTrace("No cached data entity with key {id}", dataEntity.Id);
         }
     }
 }

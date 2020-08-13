@@ -6,6 +6,8 @@ namespace BaxterStore.Data.Interfaces
     {
         bool TryGetValue(string entityId, out TDataEntity dataEntity);
 
+        void UpdateExisting(TDataEntity dataEntity);
+
         void AddToCache(TDataEntity dataEntity);
 
         void DropFromCache(string entityId);

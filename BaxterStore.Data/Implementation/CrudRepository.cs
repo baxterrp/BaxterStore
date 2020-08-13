@@ -65,7 +65,11 @@ namespace BaxterStore.Data.Implementation
 
             using (var connection = new SqlConnection(_databaseConfiguration.ConnectionString))
             {
-                return await connection.QuerySingleAsync<TDataEntity>(command, new { Id = entityId });
+                var result = await connection.QuerySingleAsync<TDataEntity>(command, new { Id = entityId });
+
+                _cacheHandler.AddToCache(result);
+
+                return result;
             }
         }
 
@@ -91,17 +95,15 @@ namespace BaxterStore.Data.Implementation
         {
             if (dataEntity is null) throw new ArgumentNullException(nameof(dataEntity));
 
-            if(_cacheHandler.TryGetValue(dataEntity.Id, out TDataEntity cachedDataEntity))
-            {
-                _cacheHandler.DropFromCache(cachedDataEntity.Id);
-                _cacheHandler.AddToCache(dataEntity);
-            }
-
             var command = BuildUpdateCommand(dataEntity);
 
             using (var connection = new SqlConnection(_databaseConfiguration.ConnectionString))
             {
-                return await connection.QuerySingleAsync<TDataEntity>(command, dataEntity);
+                var updatedDataEntity = await connection.QuerySingleAsync<TDataEntity>(command, dataEntity);
+
+                _cacheHandler.UpdateExisting(updatedDataEntity);
+
+                return updatedDataEntity;
             }
         }
 
