@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Net;
@@ -9,9 +10,12 @@ namespace BaxterStore.Data.Exceptions
     public class DataRepositoryErrorHandlerMiddleware
     {
         private readonly RequestDelegate _next;
-        public DataRepositoryErrorHandlerMiddleware(RequestDelegate next)
+        private readonly ILogger<DataRepositoryErrorHandlerMiddleware> _logger;
+
+        public DataRepositoryErrorHandlerMiddleware(RequestDelegate next, ILogger<DataRepositoryErrorHandlerMiddleware> logger)
         {
             _next = next;
+            _logger = logger;
         }
 
         public async Task Invoke(HttpContext httpContext)
@@ -52,6 +56,8 @@ namespace BaxterStore.Data.Exceptions
             httpContext.Response.StatusCode = (int)code;
 
             var stringifiedApiException = JsonConvert.SerializeObject(new ApiExceptionContainer(exception.Message));
+
+            _logger.LogTrace(exception.Message);
 
             return httpContext.Response.WriteAsync(stringifiedApiException);
         }

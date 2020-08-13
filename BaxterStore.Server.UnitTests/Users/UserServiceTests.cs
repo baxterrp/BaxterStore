@@ -6,6 +6,7 @@ using BaxterStore.Service.Implementation.Users;
 using BaxterStore.Service.Interfaces;
 using BaxterStore.Service.POCOs;
 using BCrypt;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -19,6 +20,7 @@ namespace BaxterStore.Server.UnitTests.Users
     {
         private static Mock<ICrudRepository<UserDataEntity>> _mockUserRepository;
         private static IMapper<User, UserDataEntity> _userMapper;
+        private static Mock<ILogger<UserService>> _mockLogger;
 
         private static readonly string _testId = "1d7d0504-a626-4eb1-80ca-efb14e47730a";
         private static readonly string _testPassword = "12345";
@@ -28,6 +30,7 @@ namespace BaxterStore.Server.UnitTests.Users
         {
             _mockUserRepository = new Mock<ICrudRepository<UserDataEntity>>();
             _userMapper = new UserMapper();
+            _mockLogger = new Mock<ILogger<UserService>>();
         }
 
         #region Login
@@ -38,7 +41,7 @@ namespace BaxterStore.Server.UnitTests.Users
         [TestCase("      ")]
         public void LoginThrowsIfEmailInvalid(string email)
         {
-            var sut = new UserService(_mockUserRepository.Object, _userMapper);
+            var sut = new UserService(_mockUserRepository.Object, _userMapper, _mockLogger.Object);
             var exception = Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.Login(email, _testPassword));
 
             Assert.AreEqual("email", exception.ParamName);
@@ -50,7 +53,7 @@ namespace BaxterStore.Server.UnitTests.Users
         [TestCase("      ")]
         public void LoginThrowsIfPasswordInvalid(string password)
         {
-            var sut = new UserService(_mockUserRepository.Object, _userMapper);
+            var sut = new UserService(_mockUserRepository.Object, _userMapper, _mockLogger.Object);
             var exception = Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.Login(_testEmail, password));
 
             Assert.AreEqual("password", exception.ParamName);
@@ -59,7 +62,7 @@ namespace BaxterStore.Server.UnitTests.Users
         [Test]
         public void LoginThrowsInvalidLoginAttemptFindUserReturnsNull()
         {
-            var sut = new UserService(_mockUserRepository.Object, _userMapper);
+            var sut = new UserService(_mockUserRepository.Object, _userMapper, _mockLogger.Object);
             _mockUserRepository.Setup(x => x.Search(It.IsAny<IEnumerable<SearchParameter>>())).ReturnsAsync((IEnumerable<UserDataEntity>)null);
 
             var exception = Assert.ThrowsAsync<InvalidLoginAttemptException>(async () => await sut.Login(_testEmail, _testPassword));
@@ -70,7 +73,7 @@ namespace BaxterStore.Server.UnitTests.Users
         [Test]
         public void LoginThrowsInvalidLoginAttemptIfFindUserReturnsEmpty()
         {
-            var sut = new UserService(_mockUserRepository.Object, _userMapper);
+            var sut = new UserService(_mockUserRepository.Object, _userMapper, _mockLogger.Object);
             _mockUserRepository.Setup(x => x.Search(It.IsAny<IEnumerable<SearchParameter>>())).ReturnsAsync(new List<UserDataEntity>());
 
             var exception = Assert.ThrowsAsync<InvalidLoginAttemptException>(async () => await sut.Login(_testEmail, _testPassword));
@@ -81,7 +84,7 @@ namespace BaxterStore.Server.UnitTests.Users
         [Test]
         public void LoginThrowsInvalidLoginAttemptIfInvalidPassword()
         {
-            var sut = new UserService(_mockUserRepository.Object, _userMapper);
+            var sut = new UserService(_mockUserRepository.Object, _userMapper, _mockLogger.Object);
             var expectedUser = GetUserDataEntity();
 
             expectedUser.Password = GetHashedPassword(expectedUser.Password);
@@ -99,7 +102,7 @@ namespace BaxterStore.Server.UnitTests.Users
         [Test]
         public async Task LoginReturnsUserIfLoginSuccessful()
         {
-            var sut = new UserService(_mockUserRepository.Object, _userMapper);
+            var sut = new UserService(_mockUserRepository.Object, _userMapper, _mockLogger.Object);
             var expectedUser = GetUserDataEntity();
             expectedUser.Password = GetHashedPassword(expectedUser.Password);
 
@@ -126,7 +129,7 @@ namespace BaxterStore.Server.UnitTests.Users
         {
             var user = GetUser();
             var usersHashedPassword = GetHashedPassword(user.Password);
-            var sut = new UserService(_mockUserRepository.Object, _userMapper);
+            var sut = new UserService(_mockUserRepository.Object, _userMapper, _mockLogger.Object);
 
             var addedUserDataEntity = GetUserDataEntity();
             addedUserDataEntity.Password = usersHashedPassword;
