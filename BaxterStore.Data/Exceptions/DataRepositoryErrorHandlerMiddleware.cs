@@ -51,7 +51,7 @@ namespace BaxterStore.Data.Exceptions
             httpContext.Response.ContentType = "application/json";
             httpContext.Response.StatusCode = (int)code;
 
-            var stringifiedApiException = JsonConvert.SerializeObject(new ApiException(exception.Message));
+            var stringifiedApiException = JsonConvert.SerializeObject(new ApiExceptionContainer(exception.Message));
 
             return httpContext.Response.WriteAsync(stringifiedApiException);
         }
