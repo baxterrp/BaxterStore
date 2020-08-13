@@ -29,6 +29,8 @@ namespace BaxterStore.Server.UnitTests.Users
             _userMapper = new UserMapper();
         }
 
+        #region Login
+
         [Test]
         [TestCase(null)]
         [TestCase("")]
@@ -79,7 +81,7 @@ namespace BaxterStore.Server.UnitTests.Users
         public void LoginThrowsInvalidOperationIfInvalidPassword()
         {
             var sut = new UserService(_mockUserRepository.Object, _userMapper);
-            var expectedUser = GetUser();
+            var expectedUser = GetUserDataEntity();
 
             expectedUser.Password = GetHashedPassword(expectedUser.Password);
 
@@ -97,7 +99,7 @@ namespace BaxterStore.Server.UnitTests.Users
         public async Task LoginReturnsUserIfLoginSuccessful()
         {
             var sut = new UserService(_mockUserRepository.Object, _userMapper);
-            var expectedUser = GetUser();
+            var expectedUser = GetUserDataEntity();
             expectedUser.Password = GetHashedPassword(expectedUser.Password);
 
             _mockUserRepository.Setup(x => x.Search(It.IsAny<IEnumerable<SearchParameter>>())).ReturnsAsync(new List<UserDataEntity>()
@@ -114,6 +116,38 @@ namespace BaxterStore.Server.UnitTests.Users
             Assert.AreEqual(result.Password, expectedUser.Password);
         }
 
+        #endregion Login
+
+        #region Register
+        
+        [Test]
+        public async Task RegisterNewUserRunsSuccessfully()
+        {
+            var user = GetUser();
+            var usersHashedPassword = GetHashedPassword(user.Password);
+            var sut = new UserService(_mockUserRepository.Object, _userMapper);
+
+            var addedUserDataEntity = GetUserDataEntity();
+            addedUserDataEntity.Password = usersHashedPassword;
+
+            _mockUserRepository.Setup(x => x.Search(It.IsAny<IEnumerable<SearchParameter>>())).ReturnsAsync(new List<UserDataEntity>());
+            _mockUserRepository.Setup(x => x.Add(It.IsAny<UserDataEntity>())).ReturnsAsync(addedUserDataEntity);
+
+            user.Id = string.Empty;
+
+            var result = await sut.RegisterNewUser(user);
+
+            _mockUserRepository.Verify(x => x.Add(It.IsAny<UserDataEntity>()));
+
+            Assert.False(string.IsNullOrWhiteSpace(result.Id));
+            Assert.AreEqual(user.Email, result.Email);
+            Assert.AreEqual(user.FirstName, result.FirstName);
+            Assert.AreEqual(user.LastName, result.LastName);
+            Assert.AreEqual(usersHashedPassword, result.Password);
+        }
+        
+        #endregion Register
+
         private static string GetHashedPassword(string password)
         {
             var salt = BCryptHelper.GenerateSalt();
@@ -122,7 +156,16 @@ namespace BaxterStore.Server.UnitTests.Users
             return hashedPassword;
         }
 
-        private static UserDataEntity GetUser() => new UserDataEntity
+        private static User GetUser() => new User
+        {
+            Id = _testId,
+            Email = _testEmail,
+            Password = _testPassword,
+            FirstName = "Rob",
+            LastName = "Baxter"
+        };
+
+        private static UserDataEntity GetUserDataEntity() => new UserDataEntity
         {
             Id = _testId,
             Email = _testEmail,
