@@ -149,7 +149,35 @@ namespace BaxterStore.Server.UnitTests.Users
             Assert.AreEqual(user.LastName, result.LastName);
             Assert.AreEqual(usersHashedPassword, result.Password);
         }
-        
+
+        [Test]
+        public void RegisterNewUserThrowsIfUserIsNull()
+        {
+            var sut = new UserService(_mockUserRepository.Object, _userMapper, _mockLogger.Object);
+            var exception = Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.RegisterNewUser(null));
+            Assert.AreEqual("user", exception.ParamName);
+        }
+
+        [Test]
+        public void RegisterNewUserThrowsIfUserContainsNullOrEmptyProperties()
+        {
+            var sut = new UserService(_mockUserRepository.Object, _userMapper, _mockLogger.Object);
+            var user = GetUser();
+            user.Email = string.Empty;
+            var exception = Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.RegisterNewUser(user));
+            Assert.AreEqual("Email", exception.ParamName);
+
+            user = GetUser();
+            user.FirstName = string.Empty;
+            exception = Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.RegisterNewUser(user));
+            Assert.AreEqual("FirstName", exception.ParamName);
+
+            user = GetUser();
+            user.LastName = string.Empty;
+            exception = Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.RegisterNewUser(user));
+            Assert.AreEqual("LastName", exception.ParamName);
+        }
+
         #endregion Register
 
         private static string GetHashedPassword(string password)
