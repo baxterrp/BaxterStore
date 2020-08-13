@@ -1,7 +1,6 @@
 ﻿using BaxterStore.Api.Contracts;
 using BaxterStore.Service.Interfaces;
 using BaxterStore.Service.POCOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -21,35 +20,13 @@ namespace BaxterStore.Api.Controllers
         [HttpPost("/users/login")]
         public async Task<IActionResult> Login([FromBody]LoginContract loginContract)
         {
-            try
-            {
-                return Ok(await _userService.Login(loginContract.Email, loginContract.Password));
-            }
-            catch
-            {
-                return BadRequest();
-            }
+            return Ok(await _userService.Login(loginContract.Email, loginContract.Password));
         }
 
         [HttpPost("/users")]
         public async Task<IActionResult> RegisterNewUser([FromBody]User user)
         {
-            try
-            {
-                return Ok(await _userService.RegisterNewUser(user));
-            }
-            catch(ArgumentNullException exception)
-            {
-                return BadRequest(exception.Message);
-            }
-            catch (InvalidOperationException exception)
-            {
-                return BadRequest(exception.Message);
-            }
-            catch (Exception)
-            {
-                return new ObjectResult(StatusCodes.Status500InternalServerError);
-            }
+            return Ok(await _userService.RegisterNewUser(user));
         }
     }
 }

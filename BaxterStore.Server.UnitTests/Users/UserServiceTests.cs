@@ -1,4 +1,5 @@
-﻿using BaxterStore.Data.Interfaces;
+﻿using BaxterStore.Data.Exceptions;
+using BaxterStore.Data.Interfaces;
 using BaxterStore.Data.POCOs;
 using BaxterStore.Data.POCOs.Users;
 using BaxterStore.Service.Implementation.Users;
@@ -56,29 +57,29 @@ namespace BaxterStore.Server.UnitTests.Users
         }
 
         [Test]
-        public void LoginThrowsInvalidOperationIfFindUserReturnsNull()
+        public void LoginThrowsInvalidLoginAttemptFindUserReturnsNull()
         {
             var sut = new UserService(_mockUserRepository.Object, _userMapper);
             _mockUserRepository.Setup(x => x.Search(It.IsAny<IEnumerable<SearchParameter>>())).ReturnsAsync((IEnumerable<UserDataEntity>)null);
 
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.Login(_testEmail, _testPassword));
+            var exception = Assert.ThrowsAsync<InvalidLoginAttemptException>(async () => await sut.Login(_testEmail, _testPassword));
 
             Assert.AreEqual($"No user found with email {_testEmail}", exception.Message);
         }
 
         [Test]
-        public void LoginThrowsInvalidOperationIfFindUserReturnsEmpty()
+        public void LoginThrowsInvalidLoginAttemptIfFindUserReturnsEmpty()
         {
             var sut = new UserService(_mockUserRepository.Object, _userMapper);
             _mockUserRepository.Setup(x => x.Search(It.IsAny<IEnumerable<SearchParameter>>())).ReturnsAsync(new List<UserDataEntity>());
 
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.Login(_testEmail, _testPassword));
+            var exception = Assert.ThrowsAsync<InvalidLoginAttemptException>(async () => await sut.Login(_testEmail, _testPassword));
 
             Assert.AreEqual($"No user found with email {_testEmail}", exception.Message);
         }
 
         [Test]
-        public void LoginThrowsInvalidOperationIfInvalidPassword()
+        public void LoginThrowsInvalidLoginAttemptIfInvalidPassword()
         {
             var sut = new UserService(_mockUserRepository.Object, _userMapper);
             var expectedUser = GetUserDataEntity();
@@ -90,7 +91,7 @@ namespace BaxterStore.Server.UnitTests.Users
                 expectedUser
             });
 
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.Login(_testEmail, "some invalid password"));
+            var exception = Assert.ThrowsAsync<InvalidLoginAttemptException>(async () => await sut.Login(_testEmail, "some invalid password"));
 
             Assert.AreEqual("Invalid credentials given", exception.Message);
         }

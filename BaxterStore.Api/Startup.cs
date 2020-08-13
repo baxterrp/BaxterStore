@@ -1,3 +1,4 @@
+using BaxterStore.Data.Exceptions;
 using BaxterStore.Data.Implementation.Users;
 using BaxterStore.Data.Interfaces;
 using BaxterStore.Data.POCOs;
@@ -52,6 +53,8 @@ namespace BaxterStore.Api
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseMiddleware(typeof(DataRepositoryErrorHandlerMiddleware));
 
             app.UseEndpoints(endpoints =>
             {

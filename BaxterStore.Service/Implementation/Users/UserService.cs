@@ -1,4 +1,5 @@
-﻿using BaxterStore.Data.Interfaces;
+﻿using BaxterStore.Data.Exceptions;
+using BaxterStore.Data.Interfaces;
 using BaxterStore.Data.POCOs;
 using BaxterStore.Data.POCOs.Users;
 using BaxterStore.Service.Interfaces;
@@ -34,7 +35,7 @@ namespace BaxterStore.Service.Implementation.Users
 
             var expectedUser = (await _userRepository.Search(searchParams))?.FirstOrDefault();
 
-            if (expectedUser is null) throw new InvalidOperationException($"No user found with email {email}");
+            if (expectedUser is null) throw new InvalidLoginAttemptException($"No user found with email {email}");
 
             CheckPassword(password, expectedUser.Password);
             
@@ -64,7 +65,7 @@ namespace BaxterStore.Service.Implementation.Users
             
             var userDataEntity = await _userRepository.FindById(user.Id);
 
-            if (userDataEntity is null) throw new InvalidOperationException($"No user found with id {user.Id}");
+            if (userDataEntity is null) throw new InvalidLoginAttemptException($"No user found with id {user.Id}");
 
             var mappedUser = _mapper.MapToEntity(user);
 
@@ -78,7 +79,7 @@ namespace BaxterStore.Service.Implementation.Users
 
         private void CheckPassword(string password, string hashedPassword)
         {
-            if(!BCryptHelper.CheckPassword(password, hashedPassword)) throw new InvalidOperationException("Invalid credentials given");
+            if(!BCryptHelper.CheckPassword(password, hashedPassword)) throw new InvalidLoginAttemptException("Invalid credentials given");
         }
 
         private string HashPassword(string password)
@@ -98,7 +99,7 @@ namespace BaxterStore.Service.Implementation.Users
 
             var existingUserList = await _userRepository.Search(searchParams);
 
-            if (existingUserList?.Any() ?? false) throw new InvalidOperationException($"User with email {email} already exists");
+            if (existingUserList?.Any() ?? false) throw new DuplicateResourceException($"User with email {email} already exists");
         }
 
         private void ValidateUser(User user)
