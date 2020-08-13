@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaxterStore.Service", "Baxt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaxterStore.Api", "BaxterStore.Api\BaxterStore.Api.csproj", "{31BEDB34-CF3D-48C5-98BF-AB905751B488}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaxterStore.Server.UnitTests", "BaxterStore.Server.UnitTests\BaxterStore.Server.UnitTests.csproj", "{FFDA4887-AFDC-4801-8C96-3B8102A9BE28}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{31BEDB34-CF3D-48C5-98BF-AB905751B488}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31BEDB34-CF3D-48C5-98BF-AB905751B488}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31BEDB34-CF3D-48C5-98BF-AB905751B488}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFDA4887-AFDC-4801-8C96-3B8102A9BE28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFDA4887-AFDC-4801-8C96-3B8102A9BE28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFDA4887-AFDC-4801-8C96-3B8102A9BE28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFDA4887-AFDC-4801-8C96-3B8102A9BE28}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
