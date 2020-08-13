@@ -1,4 +1,5 @@
 using BaxterStore.Data.Exceptions;
+using BaxterStore.Data.Implementation;
 using BaxterStore.Data.Implementation.Users;
 using BaxterStore.Data.Interfaces;
 using BaxterStore.Data.Migrations;
@@ -28,6 +29,11 @@ namespace BaxterStore.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMemoryCache();
+            services.AddControllers();
+
+            services.AddSingleton<ICacheHandler<UserDataEntity>, CacheHandler<UserDataEntity>>();
+
             var databaseConfiguration = new DatabaseConfiguration();
             Configuration.GetSection("DatabaseConfiguration").Bind(databaseConfiguration);
             services.AddSingleton(databaseConfiguration);
@@ -37,14 +43,12 @@ namespace BaxterStore.Api
 
             var userTableConfiguration = new TableConfiguration();
             Configuration.GetSection("TableConfiguration:Users").Bind(userTableConfiguration);
-            services.AddSingleton<ICrudRepository<UserDataEntity>, UserRepository>(sp => new UserRepository(databaseConfiguration, userTableConfiguration));
+            services.AddSingleton<ICrudRepository<UserDataEntity>, UserRepository>(sp => new UserRepository(databaseConfiguration, userTableConfiguration, sp.GetRequiredService<ICacheHandler<UserDataEntity>>()));
 
             services.AddFluentMigratorCore()
                 .ConfigureRunner(runner => runner.AddSqlServer()
                     .WithGlobalConnectionString(databaseConfiguration.ConnectionString)
                     .ScanIn(typeof(Version1).Assembly).For.Migrations());
-
-            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

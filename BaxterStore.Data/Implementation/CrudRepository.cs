@@ -15,11 +15,13 @@ namespace BaxterStore.Data.Implementation
     {
         private readonly DatabaseConfiguration _databaseConfiguration;
         private readonly TableConfiguration _tableConfiguration;
+        private readonly ICacheHandler<TDataEntity> _cacheHandler;
 
-        protected CrudRepository(DatabaseConfiguration databaseConfiguration, TableConfiguration tableConfiguration)
+        public CrudRepository(DatabaseConfiguration databaseConfiguration, TableConfiguration tableConfiguration, ICacheHandler<TDataEntity> cacheHandler)
         {
             _databaseConfiguration = databaseConfiguration ?? throw new ArgumentNullException(nameof(databaseConfiguration));
             _tableConfiguration = tableConfiguration ?? throw new ArgumentNullException(nameof(tableConfiguration));
+            _cacheHandler = cacheHandler ?? throw new ArgumentNullException(nameof(cacheHandler));
         }
 
         public async Task<TDataEntity> Add(TDataEntity dataEntity)
@@ -31,7 +33,11 @@ namespace BaxterStore.Data.Implementation
 
             using (var connection = new SqlConnection(_databaseConfiguration.ConnectionString))
             {
-                return await connection.QuerySingleAsync<TDataEntity>(command, dataEntity);
+                var result = await connection.QuerySingleAsync<TDataEntity>(command, dataEntity);
+
+                _cacheHandler.AddToCache(dataEntity);
+
+                return result;
             }
         }
 
@@ -40,6 +46,8 @@ namespace BaxterStore.Data.Implementation
             if (string.IsNullOrWhiteSpace(entityId)) throw new ArgumentNullException(nameof(entityId));
 
             var command = BuildDeleteStatement();
+
+            _cacheHandler.DropFromCache(entityId);
 
             using (var connection = new SqlConnection(_databaseConfiguration.ConnectionString))
             {
@@ -50,6 +58,9 @@ namespace BaxterStore.Data.Implementation
         public async Task<TDataEntity> FindById(string entityId)
         {
             if (string.IsNullOrWhiteSpace(entityId)) throw new ArgumentNullException(nameof(entityId));
+
+            if (_cacheHandler.TryGetValue(entityId, out TDataEntity dataEntity)) return dataEntity;
+
             var command = BuildFindByIdQuery();
 
             using (var connection = new SqlConnection(_databaseConfiguration.ConnectionString))
@@ -79,6 +90,13 @@ namespace BaxterStore.Data.Implementation
         public async Task<TDataEntity> Update(TDataEntity dataEntity)
         {
             if (dataEntity is null) throw new ArgumentNullException(nameof(dataEntity));
+
+            if(_cacheHandler.TryGetValue(dataEntity.Id, out TDataEntity cachedDataEntity))
+            {
+                _cacheHandler.DropFromCache(cachedDataEntity.Id);
+                _cacheHandler.AddToCache(dataEntity);
+            }
+
             var command = BuildUpdateCommand(dataEntity);
 
             using (var connection = new SqlConnection(_databaseConfiguration.ConnectionString))
