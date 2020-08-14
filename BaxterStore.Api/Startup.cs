@@ -14,6 +14,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace BaxterStore.Api
 {
@@ -33,22 +37,18 @@ namespace BaxterStore.Api
             services.AddControllers();
 
             services.AddSingleton<ICacheHandler<UserDataEntity>, CacheHandler<UserDataEntity>>();
+            services.AddSingleton<IMapper<User, UserDataEntity>, UserMapper>();
+            services.AddSingleton<IUserService, UserService>();
 
             var databaseConfiguration = new DatabaseConfiguration();
             Configuration.GetSection("DatabaseConfiguration").Bind(databaseConfiguration);
             services.AddSingleton(databaseConfiguration);
 
-            services.AddSingleton<IMapper<User, UserDataEntity>, UserMapper>();
-            services.AddSingleton<IUserService, UserService>();
+            services.AddFluentMigrator(databaseConfiguration.ConnectionString);
 
             var userTableConfiguration = new TableConfiguration();
             Configuration.GetSection("TableConfiguration:Users").Bind(userTableConfiguration);
             services.AddSingleton<ICrudRepository<UserDataEntity>, UserRepository>(sp => new UserRepository(databaseConfiguration, userTableConfiguration, sp.GetRequiredService<ICacheHandler<UserDataEntity>>()));
-
-            services.AddFluentMigratorCore()
-                .ConfigureRunner(runner => runner.AddSqlServer()
-                    .WithGlobalConnectionString(databaseConfiguration.ConnectionString)
-                    .ScanIn(typeof(Version1).Assembly).For.Migrations());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -73,6 +73,25 @@ namespace BaxterStore.Api
             });
 
             runner.MigrateUp();
+        }
+
+    }
+
+    public static class ServiceCollectionExtensions
+    {
+        public static IServiceCollection AddFluentMigrator(this IServiceCollection services, string connectionString)
+        {
+            var migrationAssemblies = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(assembly => assembly.GetTypes())
+                .Where(t => t.IsClass && t.Namespace == "BaxterStore.Data.Migrations")
+                .Select(x => x.Assembly).ToArray();
+
+            services.AddFluentMigratorCore()
+                .ConfigureRunner(runner => runner.AddSqlServer()
+                    .WithGlobalConnectionString(connectionString)
+                    .ScanIn(migrationAssemblies).For.Migrations());
+
+            return services;
         }
     }
 }
