@@ -2,7 +2,6 @@ using BaxterStore.Data.Exceptions;
 using BaxterStore.Data.Implementation;
 using BaxterStore.Data.Implementation.Users;
 using BaxterStore.Data.Interfaces;
-using BaxterStore.Data.Migrations;
 using BaxterStore.Data.POCOs;
 using BaxterStore.Data.POCOs.Users;
 using BaxterStore.Service.Implementation.Users;
@@ -16,8 +15,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace BaxterStore.Api
 {

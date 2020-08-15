@@ -1,7 +1,4 @@
-﻿using BaxterStore.Data.POCOs;
-using BaxterStore.Service.POCOs;
-using System.Collections;
-using System.Collections.Generic;
+﻿using BaxterStore.Service.POCOs;
 using System.Threading.Tasks;
 
 namespace BaxterStore.Service.Interfaces
