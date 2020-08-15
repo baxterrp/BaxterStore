@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Net;
+using System.Net.Mime;
 using System.Threading.Tasks;
 
 namespace BaxterStore.Data.Exceptions
@@ -26,11 +27,23 @@ namespace BaxterStore.Data.Exceptions
             }
             catch (Exception exception)
             {
-                await HandleException(httpContext, exception);
+                await WriteHttpContextResponse(httpContext, exception);
             }
         }
 
-        private Task HandleException(HttpContext httpContext, Exception exception)
+        private async Task WriteHttpContextResponse(HttpContext httpContext, Exception exception)
+        { 
+            httpContext.Response.ContentType = MediaTypeNames.Application.Json;
+            httpContext.Response.StatusCode = GetHttpStatusCode(exception);
+
+            var stringifiedApiException = JsonConvert.SerializeObject(new ApiExceptionContainer(exception.Message));
+
+            _logger.LogTrace(exception.Message);
+
+            await httpContext.Response.WriteAsync(stringifiedApiException);
+        }
+
+        private int GetHttpStatusCode(Exception exception)
         {
             HttpStatusCode code;
 
@@ -52,14 +65,7 @@ namespace BaxterStore.Data.Exceptions
                     break;
             }
 
-            httpContext.Response.ContentType = "application/json";
-            httpContext.Response.StatusCode = (int)code;
-
-            var stringifiedApiException = JsonConvert.SerializeObject(new ApiExceptionContainer(exception.Message));
-
-            _logger.LogTrace(exception.Message);
-
-            return httpContext.Response.WriteAsync(stringifiedApiException);
+            return (int)code;
         }
     }
 }
