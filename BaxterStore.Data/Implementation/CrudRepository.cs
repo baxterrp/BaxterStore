@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace BaxterStore.Data.Implementation
 {
-    public class CrudRepository<TDataEntity> : ICrudRepository<TDataEntity> where TDataEntity : DataEntity
+    public abstract class CrudRepository<TDataEntity> : ICrudRepository<TDataEntity> where TDataEntity : DataEntity
     {
         private readonly DatabaseConfiguration _databaseConfiguration;
         private readonly TableConfiguration _tableConfiguration;
